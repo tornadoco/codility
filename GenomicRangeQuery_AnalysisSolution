@@ -1,0 +1,71 @@
+Original thought：
+  a. 给定m对数(P[i]，Q[i],其中i属于[1,m]),找S(P[i],Q[i])之间的最小值
+  b. 对于每一对数，平均距离是n/2，最长情况是n。因而用最朴素的方法求解，时间复杂度是O(M*N)
+  c. 题目要求的时间复杂度是O(N+M)，而且该题属于Prefix_Sums范畴，因此猜测的结题思路是先对
+     DNA链S=S[0]S[1]....S[N-1]进行遍历处理，得到一处理后的空间复杂度为O(n)数组，然后对于
+     每一次query，直接从该数组中读取即可
+  d. 可以遍历一遍，生成4个数组，totalA, totalC, totalG, totalT, 其中totalA[i]记录
+     S[0,...,i]中A碱基的个数，此处时间复杂度为O(N)
+  e. 对于给定的P[K]和Q[K]，分别计算P[K]和Q[K]之间的4种碱基的个数，
+     以A碱基为例，P[K]和Q[K]之间A碱基的个数为totalA[QK]-totalA[PK-1],
+     (当PK等于0时，该值为totalA[QK]）
+  f. 如果A碱基存在，那么返回1，次之返回2，一直返回4
+  g. e步和f步的时间复杂度为O(1)，重复M次，为O(M)
+
+Code:
+def solution(S,P,Q):
+    N = len(S)
+    M = len(P)
+    totalA = [0]*N
+    totalC = [0]*N
+    totalG = [0]*N
+    totalT = [0]*N
+
+    A,C,G,T = 0,0,0,0
+
+    result = [0]*M
+
+
+    for i in range(N):    # Time complexity O(N)
+        key = S[i]
+        if key == 'A':
+            A += 1
+        elif key == 'C':
+            C += 1
+        elif key == 'G':
+            G += 1
+        else:
+            T += 1
+
+        totalA[i] = A
+        totalC[i] = C
+        totalG[i] = G
+        totalT[i] = T
+
+    for k in range(M):
+        Pk = P[k]
+        Qk = Q[k]
+
+        if Pk == 0:
+            numA_qkpk = totalA[Qk]
+            numC_qkpk = totalC[Qk]
+            numG_qkpk = totalG[Qk]
+        else:
+            numA_qkpk = totalA[Qk] - totalA[Pk-1]
+            numC_qkpk = totalC[Qk] - totalC[Pk-1]
+            numG_qkpk = totalG[Qk] - totalG[Pk-1]
+
+        if numA_qkpk != 0:
+            result[k] = 1
+        elif numC_qkpk != 0:
+            result[k] = 2
+        elif numG_qkpk !=0:
+            result[k] = 3
+        else:
+            result[k] = 4
+
+
+    return result
+  
+ Performance:
+ Test Score: 100%
