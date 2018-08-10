@@ -1,0 +1,26 @@
+Original thought:
+1) 最原始的思路：(N-1)+(N-2)+...+1 = (N-1)*N/2次计算，每次计算的平均值是 N/2
+   所以时间步复杂度是O(N^3)
+2) 储存两个数组: sumForward和sumBackward
+   定义sumForward[i] = sum(A[0...i]), O(N)，这样的话计算平均值的复杂度变为O(1)
+   时间步复杂度是O(N^2)
+3) 涉及到平均值求最小，如果长度大于2的话，那么只需要求该元素开始，长度为2或3的平均值
+   的最小值情况。因为长度大于3的数组都可以拆分为长度为2或3的子数组，再拆分的子数组中，
+   必有一子数组的平均值小于等于拆分前的数组
+4) 对于长度为N的数组[0,N-1]，对于N-2，求两个的平均值，设为初始值
+   对于range(N-3, -1, -1)，求两个与三个的平均值，并与先前的进行对比
+
+
+Code:
+def solution(A):
+    N = len(A)
+    minIndex = N-2
+    minAvg = (A[N-2] + A[N-1])/2
+
+    for i in range(N-3, -1, -1):
+        minAvgI = min((A[i]+A[i+1]+A[i+2])/3, (A[i]+A[i+1])/2)
+        if minAvgI <= minAvg:
+            minIndex = i
+            minAvg = minAvgI
+
+    return minIndex
